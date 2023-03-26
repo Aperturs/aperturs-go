@@ -2,12 +2,187 @@
 
 package model
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+import (
+	"fmt"
+	"io"
+	"strconv"
+	"time"
+)
+
+type Slot interface {
+	IsSlot()
+	GetDateNTime() time.Time
+	GetSocialMedia() SocialMediaType
+	GetContent() string
+}
+
+type ActiveSubscription struct {
+	ID            string `json:"_id"`
+	PlanID        string `json:"plan_id"`
+	TransactionID string `json:"transaction_id"`
+	UserID        string `json:"user_id"`
+}
+
+type LoginResponse struct {
+	Token string `json:"token"`
+	ID    string `json:"id"`
+}
+
+type NewAccount struct {
+	Email    *string `json:"email"`
+	Password *string `json:"password"`
+}
+
+type Plan struct {
+	ID            string    `json:"_id"`
+	Time          time.Time `json:"time"`
+	Title         string    `json:"title"`
+	PricePerMonth int       `json:"price_per_month"`
+	Features      []*string `json:"features"`
+}
+
+type Queue struct {
+	ID     string `json:"_id"`
+	UserID string `json:"user_id"`
+	Slots  []Slot `json:"slots"`
 }
 
 type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID              string   `json:"_id"`
+	FullName        string   `json:"full_name"`
+	Plan            PlanType `json:"plan"`
+	TimeZone        string   `json:"time_zone"`
+	CreationDate    string   `json:"creation_date"`
+	LinkedIn        *string  `json:"linkedIn"`
+	Twitter         *string  `json:"twitter"`
+	Instagram       *string  `json:"instagram"`
+	AccountID       string   `json:"accountID"`
+	AccountManagers []*User  `json:"account_managers"`
+}
+
+type PlanType string
+
+const (
+	PlanTypeFree  PlanType = "FREE"
+	PlanTypeBasic PlanType = "BASIC"
+	PlanTypePro   PlanType = "PRO"
+)
+
+var AllPlanType = []PlanType{
+	PlanTypeFree,
+	PlanTypeBasic,
+	PlanTypePro,
+}
+
+func (e PlanType) IsValid() bool {
+	switch e {
+	case PlanTypeFree, PlanTypeBasic, PlanTypePro:
+		return true
+	}
+	return false
+}
+
+func (e PlanType) String() string {
+	return string(e)
+}
+
+func (e *PlanType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = PlanType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid PlanType", str)
+	}
+	return nil
+}
+
+func (e PlanType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type RoleType string
+
+const (
+	RoleTypeUser  RoleType = "USER"
+	RoleTypeAdmin RoleType = "ADMIN"
+)
+
+var AllRoleType = []RoleType{
+	RoleTypeUser,
+	RoleTypeAdmin,
+}
+
+func (e RoleType) IsValid() bool {
+	switch e {
+	case RoleTypeUser, RoleTypeAdmin:
+		return true
+	}
+	return false
+}
+
+func (e RoleType) String() string {
+	return string(e)
+}
+
+func (e *RoleType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = RoleType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid RoleType", str)
+	}
+	return nil
+}
+
+func (e RoleType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type SocialMediaType string
+
+const (
+	SocialMediaTypeLinkedin  SocialMediaType = "LINKEDIN"
+	SocialMediaTypeTwitter   SocialMediaType = "TWITTER"
+	SocialMediaTypeInstagram SocialMediaType = "INSTAGRAM"
+)
+
+var AllSocialMediaType = []SocialMediaType{
+	SocialMediaTypeLinkedin,
+	SocialMediaTypeTwitter,
+	SocialMediaTypeInstagram,
+}
+
+func (e SocialMediaType) IsValid() bool {
+	switch e {
+	case SocialMediaTypeLinkedin, SocialMediaTypeTwitter, SocialMediaTypeInstagram:
+		return true
+	}
+	return false
+}
+
+func (e SocialMediaType) String() string {
+	return string(e)
+}
+
+func (e *SocialMediaType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = SocialMediaType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid SocialMediaType", str)
+	}
+	return nil
+}
+
+func (e SocialMediaType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }

@@ -1,28 +1,90 @@
 # GraphQL schema example
 #
 # https://gqlgen.com/getting-started/
+scalar DateTime
+scalar Date
 
-type Todo {
-  id: ID!
-  text: String!
-  done: Boolean!
-  user: User!
+directive @hasRole(role: RoleType!) on FIELD_DEFINITION
+
+enum PlanType {
+  FREE
+  BASIC
+  PRO
+}
+enum SocialMediaType {
+  LINKEDIN
+  TWITTER
+  INSTAGRAM
+}
+enum RoleType {
+  USER
+  ADMIN
+}
+type LoginResponse {
+  token: String!
+  id: String!
+}
+type Account {
+  _id: String!
+  email: String!
+  role: RoleType!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+type User {
+  _id: String!
+  full_name: String!
+  plan: PlanType!
+  time_zone: String!
+  creation_date: Date!
+  linkedIn: String
+  twitter: String
+  instagram: String
+  accountID: String!
+  account_managers: [User]
+}
+type Plan {
+  _id: String!
+  time: DateTime!
+  title: String!
+  price_per_month: Int!
+  features: [String]
+}
+interface Slot {
+  date_n_time: DateTime!
+  social_media: SocialMediaType!
+  content: String!
+}
+type ActiveSubscription {
+  _id: String!
+  plan_id: String!
+  transaction_id: String!
+  user_id: String!
 }
 
-type User {
-  id: ID!
-  name: String!
+type Queue {
+  _id: String!
+  user_id: String!
+  slots: [Slot!]!
 }
 
 type Query {
-  todos: [Todo!]!
+  # user(id: String!): User
+  account(id: String!): Account
 }
-
-input NewTodo {
-  text: String!
-  userId: String!
+input NewAccount {
+  email: String
+  password: String
 }
-
 type Mutation {
-  createTodo(input: NewTodo!): Todo!
+  registerWithEmail(input: NewAccount!): LoginResponse!
+  loginWithEmail(email: String!, password: String!): LoginResponse!
 }
+# input NewTodo {
+#   text: String!
+#   userId: String!
+# }
+
+# type Mutation {
+#   createTodo(input: NewTodo!): Todo!
+# }

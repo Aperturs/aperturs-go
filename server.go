@@ -1,6 +1,7 @@
 package main
 
 import (
+	"apertursGin/database"
 	"apertursGin/graph"
 	"log"
 	"net/http"
@@ -12,20 +13,23 @@ import (
 )
 
 const defaultPort = "8080"
-
 func main() {
 	err := godotenv.Load()
+
 	if err!=nil{
 		log.Fatal("Error Loading .env file")
 	}
+	
 	port := os.Getenv("PORT")
+	log.Println(port," This is the Port")
 	if port == "" {
 		port = defaultPort
 	}
+	db := database.Connect();
+	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
+		DB:db,
+	}}))
 	
-
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
-
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)
 

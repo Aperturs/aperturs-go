@@ -61,7 +61,11 @@ models:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int32
-  Todo:
+  DateTime:
+    model:
+      - github.com/nrfta/go-graphql-scalars.DateTime
+      - github.com/nrfta/go-graphql-scalars.NullDateTime
+  Account:
     fields:
       user:
         resolver: true
